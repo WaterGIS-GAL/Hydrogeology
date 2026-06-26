@@ -18,9 +18,9 @@ Si vienes desde YouTube o quieres ver el paso a paso de cómo utilizar estos arc
 
 ### Instrucciones de Uso
 1.  **Clona o descarga este repositorio** en tu máquina local.
-2.  Carga la capa de puntos de tus pozos en tu proyecto de QGIS (asegúrate de que las columnas coincidan con los nombres de los parámetros del script, como `caudal_m3d` e `id_pozo`).
+2.  Sigue los pasos en los tutoriales del canal de YouTube en tu proyecto de QGIS, adenas asegúrate de que las columnas coincidan con los nombres de los parámetros del script para sustituirlos con los de tu proyecto
 3.  Abre la **Consola de Python** en QGIS (`Complementos -> Consola de Python`).
-4.  Abre el editor de texto de la consola, carga el archivo `simbologia_pro_pozos.py` ubicado en la carpeta `/scripts` y haz clic en **Ejecutar**.
+4.  Abre el editor de texto de la consola, carga el archivo correspondiente al tutorial que estamos haciendo `Archivodelvideo.py` ubicado en la carpeta `/scripts` y haz clic en **Ejecutar**.
 
 ## 🛠️ Contribuciones y Comunidad
 Este espacio está abierto a la retroalimentación de la comunidad de ingeniería ambiental, hidrogeología y geomática. Si encuentras un error en las API de las versiones más recientes de QGIS o deseas proponer una optimización para flujos de modelado de acuíferos o análisis hidrogeoquímico:
