@@ -55,7 +55,7 @@ if capa and capa.isValid():
             
     capa.setRenderer(renderizador)
 
-    # ==== ETIQUETADO INTELIGENTE (LABELS) ====
+    # ==== ETIQUETADO INTELIGENTE ====
     config_etiqueta = QgsPalLayerSettings()
     
     # Expresión SQL de QGIS
@@ -68,7 +68,7 @@ if capa and capa.isValid():
     formato_texto.setSize(9)
     formato_texto.setColor(QColor("black"))
     
-    # Añadir un Buffer (Halo blanco)
+    # Añadir un Buffer
     buffer_texto = QgsTextBufferSettings()
     buffer_texto.setEnabled(True)
     buffer_texto.setSize(1.2)
@@ -91,7 +91,7 @@ if capa and capa.isValid():
     # Refrescar la vista
     capa.triggerRepaint()
     iface.layerTreeView().refreshLayerSymbology(capa.id())
-    print("¡Simbología limpia (sin sombra) y etiquetas aplicadas correctamente!")
+    print("¡Simbología limpia!")
     
 else:
     print("Error: Selecciona una capa vectorial.")
