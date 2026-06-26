@@ -1,0 +1,97 @@
+from qgis.core import (
+    QgsProject, QgsGraduatedSymbolRenderer, QgsClassificationJenks,
+    QgsMarkerSymbol, QgsPalLayerSettings, QgsVectorLayerSimpleLabeling,
+    QgsTextFormat, QgsTextBufferSettings, Qgis
+)
+from qgis.utils import iface
+from PyQt5.QtGui import QColor, QFont
+
+# 1. Seleccionar la capa activa
+capa = iface.activeLayer()
+
+if capa and capa.isValid():
+    # ==== CONFIGURACIÓN DE PARÁMETROS ====
+    campo_caudal = 'caudal_m3d'  # Tu columna de caudal
+    campo_nombre = 'id_pozo'     # Tu columna con el número o nombre del pozo
+    num_clases = 5
+    tamano_min = 4.0
+    tamano_max = 16.0
+    # =====================================
+    
+    # Iniciar renderizador por tamaño
+    renderizador = QgsGraduatedSymbolRenderer()
+    renderizador.setClassAttribute(campo_caudal)
+    renderizador.setGraduatedMethod(QgsGraduatedSymbolRenderer.GraduatedSize)
+    
+    clasificador = QgsClassificationJenks()
+    renderizador.setClassificationMethod(clasificador)
+    renderizador.updateClasses(capa, num_clases)
+    
+    rangos = renderizador.ranges()
+    if rangos:
+        paso_tamano = (tamano_max - tamano_min) / max(1, len(rangos) - 1)
+        
+        for i, rango in enumerate(rangos):
+            # Símbolo con color azul sólido y sin efectos de sombra
+            simbolo_base = QgsMarkerSymbol.createSimple({
+                'name': 'circle',
+                'color': '31,120,180,255', 
+                'outline_color': '10,60,100,255',
+                'outline_width': '0.6'
+            })
+            
+            # Asignar tamaño dinámico
+            tamano_rango = tamano_min + (i * paso_tamano)
+            simbolo_base.setSize(tamano_rango)
+            
+            # Limpiar el texto de la leyenda
+            limite_inf = round(rango.lowerValue(), 1)
+            limite_sup = round(rango.upperValue(), 1)
+            etiqueta_limpia = f"{limite_inf} - {limite_sup} m³/día"
+            
+            # Actualizar símbolo y leyenda directamente en el renderizador
+            renderizador.updateRangeSymbol(i, simbolo_base)
+            renderizador.updateRangeLabel(i, etiqueta_limpia)
+            
+    capa.setRenderer(renderizador)
+
+    # ==== ETIQUETADO INTELIGENTE (LABELS) ====
+    config_etiqueta = QgsPalLayerSettings()
+    
+    # Expresión SQL de QGIS
+    config_etiqueta.fieldName = f" 'Pozo ' || \"{campo_nombre}\" || '\n' || round(\"{campo_caudal}\", 1) || ' m³/d' "
+    config_etiqueta.isExpression = True
+
+    # Formato del texto
+    formato_texto = QgsTextFormat()
+    formato_texto.setFont(QFont("Arial"))  
+    formato_texto.setSize(9)
+    formato_texto.setColor(QColor("black"))
+    
+    # Añadir un Buffer (Halo blanco)
+    buffer_texto = QgsTextBufferSettings()
+    buffer_texto.setEnabled(True)
+    buffer_texto.setSize(1.2)
+    buffer_texto.setColor(QColor("white"))
+    formato_texto.setBuffer(buffer_texto)
+    
+    config_etiqueta.setFormat(formato_texto)
+    
+    # Ubicación moderna
+    config_etiqueta.placement = Qgis.LabelPlacement.OverPoint
+    config_etiqueta.quadOffset = Qgis.LabelQuadrantPosition.AboveRight
+    config_etiqueta.xOffset = 2
+    config_etiqueta.yOffset = -2
+
+    # Aplicar las etiquetas
+    etiquetado = QgsVectorLayerSimpleLabeling(config_etiqueta)
+    capa.setLabelsEnabled(True)
+    capa.setLabeling(etiquetado)
+
+    # Refrescar la vista
+    capa.triggerRepaint()
+    iface.layerTreeView().refreshLayerSymbology(capa.id())
+    print("¡Simbología limpia (sin sombra) y etiquetas aplicadas correctamente!")
+    
+else:
+    print("Error: Selecciona una capa vectorial.")
